@@ -6,8 +6,11 @@ from resources.apartment import ApartmentResource, UPLOAD_FOLDER
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:////app/data/apartments.db')
-app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', '/app/data/images')
+# Ensure /app/data exists
+data_dir = '/app/data'
+os.makedirs(data_dir, exist_ok=True)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{data_dir}/apartments.db')
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', f'{data_dir}/images')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 api = Api(app)
@@ -28,4 +31,4 @@ def get_image(filename):
 
 if __name__ == '__main__':
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
